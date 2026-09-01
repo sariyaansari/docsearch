@@ -1,529 +1,667 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Document Search — Console</title>
-<style>
-  :root {
-    --paper: #faf9f6;
-    --card: #ffffff;
-    --ink: #1c1b19;
-    --ink-soft: #6b6862;
-    --ink-faint: #9c988f;
-    --line: #e4e0d8;
-    --accent: #2f5d5a;
-    --accent-strong: #234745;
-    --accent-soft: #e4ece9;
-    --mark: #f7dfa0;
-    --danger: #a3402f;
-    --danger-soft: #fbeae6;
-    --ok: #4a8c6f;
-    --radius: 10px;
-    --mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
-    --sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html { -webkit-text-size-adjust: 100%; }
-  body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--sans);
-    line-height: 1.55;
-    font-size: 15px;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Search — Console</title>
+    <style>
+        :root {
+            --paper: #faf9f6;
+            --card: #ffffff;
+            --ink: #1c1b19;
+            --ink-soft: #6b6862;
+            --ink-faint: #9c988f;
+            --line: #e4e0d8;
+            --accent: #2f5d5a;
+            --accent-strong: #234745;
+            --accent-soft: #e4ece9;
+            --mark: #f7dfa0;
+            --danger: #a3402f;
+            --danger-soft: #fbeae6;
+            --ok: #4a8c6f;
+            --radius: 10px;
+            --mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+            --sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
 
-  /* ---------- Header ---------- */
-  header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--line);
-    background: var(--paper);
-    position: sticky;
-    top: 0;
-    z-index: 20;
-  }
-  .header-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  header h1 {
-    font-family: var(--mono);
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0;
-    letter-spacing: -0.01em;
-    white-space: nowrap;
-  }
-  header h1 span { color: var(--accent); }
-  .status-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-family: var(--mono);
-    font-size: 11.5px;
-    color: var(--ink-soft);
-    border: 1px solid var(--line);
-    padding: 5px 10px;
-    border-radius: 999px;
-    white-space: nowrap;
-  }
-  .dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--ink-faint); flex-shrink: 0;
-    transition: background 0.2s;
-  }
-  .dot.up { background: var(--ok); }
-  .dot.down { background: var(--danger); }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-  .settings-toggle {
-    display: none;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--accent);
-    background: none;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 8px 12px;
-    min-height: 40px;
-    cursor: pointer;
-  }
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
 
-  .header-settings {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
-    margin-top: 12px;
-    font-family: var(--mono);
-    font-size: 12.5px;
-    color: var(--ink-soft);
-  }
-  .header-settings label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .header-settings input {
-    font-family: var(--mono);
-    font-size: 12.5px;
-    border: 1px solid var(--line);
-    background: var(--card);
-    padding: 7px 10px;
-    border-radius: 6px;
-    width: 150px;
-    max-width: 40vw;
-    color: var(--ink);
-    min-height: 32px;
-  }
-  .header-settings input:focus { outline: none; border-color: var(--accent); }
-  .icon-link {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--accent);
-    text-decoration: none;
-    border: 1px solid var(--line);
-    padding: 6px 11px;
-    border-radius: 6px;
-    white-space: nowrap;
-    min-height: 32px;
-    display: inline-flex;
-    align-items: center;
-  }
-  .icon-link:hover { background: var(--accent-soft); }
+        body {
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: var(--sans);
+            line-height: 1.55;
+            font-size: 15px;
+        }
 
-  @media (max-width: 720px) {
-    .settings-toggle { display: inline-flex; align-items: center; }
-    .header-settings {
-      display: none;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 10px;
-    }
-    .header-settings.open { display: flex; }
-    .header-settings label { justify-content: space-between; }
-    .header-settings input { width: 60%; max-width: none; }
-  }
+        /* ---------- Header ---------- */
+        header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--line);
+            background: var(--paper);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
 
-  /* ---------- Layout ---------- */
-  .layout {
-    display: grid;
-    grid-template-columns: 360px 1fr;
-    grid-template-areas: "index search";
-    gap: 0;
-    align-items: start;
-  }
-  @media (max-width: 900px) {
-    .layout {
-      grid-template-columns: 1fr;
-      grid-template-areas: "search" "index";
-    }
-  }
-  .panel-index { grid-area: index; }
-  .panel-search { grid-area: search; }
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
 
-  .panel {
-    padding: 24px 20px;
-  }
-  .panel-index {
-    border-right: 1px solid var(--line);
-  }
-  @media (max-width: 900px) {
-    .panel-index {
-      border-right: none;
-      border-top: 1px solid var(--line);
-    }
-  }
+        header h1 {
+            display: flex;
+            align-items: baseline;
+            gap: 18px;
+            margin: 0;
+            white-space: nowrap;
+        }
 
-  .section-label {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--ink-soft);
-    margin: 0 0 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--line);
-    text-transform: none;
-  }
+        .brand-name {
+            font-family: var(--sans);
+            font-size: 19px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--ink);
+        }
 
-  /* ---------- Form fields ---------- */
-  .field { margin-bottom: 16px; }
-  .field label {
-    display: block;
-    font-size: 12.5px;
-    color: var(--ink-soft);
-    margin-bottom: 6px;
-  }
-  .field input, .field textarea {
-    width: 100%;
-    padding: 11px 13px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    font-family: var(--sans);
-    font-size: 15px;
-    background: var(--card);
-    color: var(--ink);
-    resize: vertical;
-    min-height: 44px;
-  }
-  .field textarea { min-height: 100px; }
-  .field input:focus, .field textarea:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
-  }
+            .brand-name em {
+                font-style: normal;
+                color: var(--accent);
+            }
 
-  button {
-    font-family: var(--sans);
-    font-size: 15px;
-    font-weight: 500;
-    padding: 12px 18px;
-    border-radius: var(--radius);
-    border: none;
-    cursor: pointer;
-    transition: opacity 0.15s, background 0.15s;
-    min-height: 44px;
-  }
-  button:hover { opacity: 0.9; }
-  button:active { opacity: 0.75; }
-  button:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-primary { background: var(--accent); color: white; }
-  .btn-primary:hover { background: var(--accent-strong); opacity: 1; }
-  .btn-ghost {
-    background: transparent;
-    color: var(--danger);
-    padding: 6px 10px;
-    font-size: 13px;
-    border: 1px solid var(--line);
-    min-height: 36px;
-  }
-  .btn-ghost:hover { background: var(--danger-soft); border-color: var(--danger); }
+        .brand-tag {
+            font-family: var(--mono);
+            font-size: 11.5px;
+            color: var(--ink-faint);
+            letter-spacing: 0.03em;
+        }
 
-  .msg {
-    font-size: 13.5px;
-    padding: 10px 13px;
-    border-radius: var(--radius);
-    margin-top: 12px;
-    display: none;
-  }
-  .msg.show { display: block; }
-  .msg.ok { background: var(--accent-soft); color: var(--accent-strong); }
-  .msg.err { background: var(--danger-soft); color: var(--danger); }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--mono);
+            font-size: 11.5px;
+            color: var(--ink-soft);
+            border: 1px solid var(--line);
+            padding: 5px 10px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
 
-  /* ---------- Search ---------- */
-  .search-row {
-    position: sticky;
-    top: 0;
-    background: var(--paper);
-    padding-bottom: 12px;
-    margin-bottom: 4px;
-    z-index: 5;
-  }
-  .search-row input {
-    width: 100%;
-    padding: 14px 16px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    font-size: 16px;
-    background: var(--card);
-    min-height: 48px;
-  }
-  .search-row input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
-  }
-  .search-meta {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--ink-soft);
-    margin: 8px 0 16px;
-    min-height: 16px;
-  }
-  .search-meta b { color: var(--ink); font-weight: 600; }
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--ink-faint);
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
 
-  .result {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 16px 18px;
-    margin-bottom: 12px;
-  }
-  .result-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 12px;
-    margin-bottom: 6px;
-    flex-wrap: wrap;
-  }
-  .result-title { font-size: 15.5px; font-weight: 600; }
-  .result-score {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--ink-faint);
-    white-space: nowrap;
-  }
-  .result-snippet {
-    font-size: 14px;
-    color: #46443f;
-    margin-bottom: 10px;
-  }
-  .result-snippet mark {
-    background: var(--mark);
-    color: inherit;
-    padding: 0 2px;
-    border-radius: 2px;
-  }
-  .result-foot {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--ink-faint);
-  }
-  .result-foot span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+            .dot.up {
+                background: var(--ok);
+            }
 
-  .empty {
-    color: var(--ink-soft);
-    font-size: 14px;
-    padding: 48px 20px;
-    text-align: center;
-  }
-  code {
-    font-family: var(--mono);
-    background: var(--accent-soft);
-    padding: 1px 5px;
-    border-radius: 3px;
-    font-size: 0.9em;
-  }
-</style>
+            .dot.down {
+                background: var(--danger);
+            }
+
+        .settings-toggle {
+            display: none;
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--accent);
+            background: none;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 12px;
+            min-height: 40px;
+            cursor: pointer;
+        }
+
+        .header-settings {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            font-family: var(--mono);
+            font-size: 12.5px;
+            color: var(--ink-soft);
+        }
+
+            .header-settings label {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .header-settings input {
+                font-family: var(--mono);
+                font-size: 12.5px;
+                border: 1px solid var(--line);
+                background: var(--card);
+                padding: 7px 10px;
+                border-radius: 6px;
+                width: 150px;
+                max-width: 40vw;
+                color: var(--ink);
+                min-height: 32px;
+            }
+
+                .header-settings input:focus {
+                    outline: none;
+                    border-color: var(--accent);
+                }
+
+        .icon-link {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--accent);
+            text-decoration: none;
+            border: 1px solid var(--line);
+            padding: 6px 11px;
+            border-radius: 6px;
+            white-space: nowrap;
+            min-height: 32px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+            .icon-link:hover {
+                background: var(--accent-soft);
+            }
+
+        @media (max-width: 720px) {
+            .settings-toggle {
+                display: inline-flex;
+                align-items: center;
+            }
+
+            .header-settings {
+                display: none;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+                .header-settings.open {
+                    display: flex;
+                }
+
+                .header-settings label {
+                    justify-content: space-between;
+                }
+
+                .header-settings input {
+                    width: 60%;
+                    max-width: none;
+                }
+        }
+
+        /* ---------- Layout ---------- */
+        .layout {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            grid-template-areas: "index search";
+            gap: 0;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+                grid-template-areas: "search" "index";
+            }
+        }
+
+        .panel-index {
+            grid-area: index;
+        }
+
+        .panel-search {
+            grid-area: search;
+        }
+
+        .panel {
+            padding: 24px 20px;
+        }
+
+        .panel-index {
+            border-right: 1px solid var(--line);
+        }
+
+        @media (max-width: 900px) {
+            .panel-index {
+                border-right: none;
+                border-top: 1px solid var(--line);
+            }
+        }
+
+        .section-label {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--ink-soft);
+            margin: 0 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--line);
+            text-transform: none;
+        }
+
+        /* ---------- Form fields ---------- */
+        .field {
+            margin-bottom: 16px;
+        }
+
+            .field label {
+                display: block;
+                font-size: 12.5px;
+                color: var(--ink-soft);
+                margin-bottom: 6px;
+            }
+
+            .field input, .field textarea {
+                width: 100%;
+                padding: 11px 13px;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                font-family: var(--sans);
+                font-size: 15px;
+                background: var(--card);
+                color: var(--ink);
+                resize: vertical;
+                min-height: 44px;
+            }
+
+            .field textarea {
+                min-height: 100px;
+            }
+
+                .field input:focus, .field textarea:focus {
+                    outline: none;
+                    border-color: var(--accent);
+                    box-shadow: 0 0 0 3px var(--accent-soft);
+                }
+
+        button {
+            font-family: var(--sans);
+            font-size: 15px;
+            font-weight: 500;
+            padding: 12px 18px;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.15s, background 0.15s;
+            min-height: 44px;
+        }
+
+            button:hover {
+                opacity: 0.9;
+            }
+
+            button:active {
+                opacity: 0.75;
+            }
+
+            button:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+            .btn-primary:hover {
+                background: var(--accent-strong);
+                opacity: 1;
+            }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--danger);
+            padding: 6px 10px;
+            font-size: 13px;
+            border: 1px solid var(--line);
+            min-height: 36px;
+        }
+
+            .btn-ghost:hover {
+                background: var(--danger-soft);
+                border-color: var(--danger);
+            }
+
+        .msg {
+            font-size: 13.5px;
+            padding: 10px 13px;
+            border-radius: var(--radius);
+            margin-top: 12px;
+            display: none;
+        }
+
+            .msg.show {
+                display: block;
+            }
+
+            .msg.ok {
+                background: var(--accent-soft);
+                color: var(--accent-strong);
+            }
+
+            .msg.err {
+                background: var(--danger-soft);
+                color: var(--danger);
+            }
+
+        /* ---------- Search ---------- */
+        .search-row {
+            position: sticky;
+            top: 0;
+            background: var(--paper);
+            padding-bottom: 12px;
+            margin-bottom: 4px;
+            z-index: 5;
+        }
+
+            .search-row input {
+                width: 100%;
+                padding: 14px 16px;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                font-size: 16px;
+                background: var(--card);
+                min-height: 48px;
+            }
+
+                .search-row input:focus {
+                    outline: none;
+                    border-color: var(--accent);
+                    box-shadow: 0 0 0 3px var(--accent-soft);
+                }
+
+        .search-meta {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--ink-soft);
+            margin: 8px 0 16px;
+            min-height: 16px;
+        }
+
+            .search-meta b {
+                color: var(--ink);
+                font-weight: 600;
+            }
+
+        .result {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            margin-bottom: 12px;
+        }
+
+        .result-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .result-title {
+            font-size: 15.5px;
+            font-weight: 600;
+        }
+
+        .result-score {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--ink-faint);
+            white-space: nowrap;
+        }
+
+        .result-snippet {
+            font-size: 14px;
+            color: #46443f;
+            margin-bottom: 10px;
+        }
+
+            .result-snippet mark {
+                background: var(--mark);
+                color: inherit;
+                padding: 0 2px;
+                border-radius: 2px;
+            }
+
+        .result-foot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--ink-faint);
+        }
+
+            .result-foot span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+        .empty {
+            color: var(--ink-soft);
+            font-size: 14px;
+            padding: 48px 20px;
+            text-align: center;
+        }
+
+        code {
+            font-family: var(--mono);
+            background: var(--accent-soft);
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+    </style>
 </head>
 <body>
 
-<header>
-  <div class="header-row">
-    <h1>document<span>search</span>/console</h1>
-    <button class="settings-toggle" id="settings-toggle" aria-expanded="false" aria-controls="header-settings">Settings</button>
-  </div>
-  <div class="header-settings" id="header-settings">
-    <span class="status-pill"><span class="dot" id="health-dot"></span><span id="health-text">checking…</span></span>
-    <label>API URL <input id="base-url" value="http://localhost:8000"></label>
-    <label>Tenant <input id="tenant-id" value="tenant-acme"></label>
-    <a href="/architecture" class="icon-link">Architecture ↗</a>
-    <a href="https://console.neon.tech" target="_blank" rel="noopener" class="icon-link">DB console ↗</a>
-  </div>
-</header>
-
-<div class="layout">
-  <div class="panel panel-search">
-    <p class="section-label">search</p>
-    <div class="search-row">
-      <input id="search-input" placeholder="Search this tenant's documents…" autofocus>
-    </div>
-    <div class="search-meta" id="search-meta"></div>
-    <div id="results"></div>
-  </div>
-
-  <div class="panel panel-index">
-    <p class="section-label">index a document</p>
-    <div class="field">
-      <label for="doc-title">Title</label>
-      <input id="doc-title" placeholder="Q3 Financial Report">
-    </div>
-    <div class="field">
-      <label for="doc-content">Content</label>
-      <textarea id="doc-content" placeholder="Revenue grew 12% quarter over quarter, driven by..."></textarea>
-    </div>
-    <div class="field">
-      <label for="doc-category">Category (metadata, optional)</label>
-      <input id="doc-category" placeholder="engineering">
-    </div>
-    <button class="btn-primary" id="index-btn" style="width:100%">Index document</button>
-    <div class="msg" id="index-msg"></div>
-  </div>
-</div>
-
-<script>
-const $ = (id) => document.getElementById(id);
-const baseUrl = () => $('base-url').value.replace(/\/$/, '');
-const tenant = () => $('tenant-id').value.trim();
-
-function escapeHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-const settingsToggle = $('settings-toggle');
-const headerSettings = $('header-settings');
-settingsToggle.addEventListener('click', () => {
-  const isOpen = headerSettings.classList.toggle('open');
-  settingsToggle.setAttribute('aria-expanded', String(isOpen));
-  settingsToggle.textContent = isOpen ? 'Close' : 'Settings';
-});
-
-async function checkHealth() {
-  const dot = $('health-dot'), text = $('health-text');
-  try {
-    const res = await fetch(`${baseUrl()}/health`);
-    const data = await res.json();
-    dot.className = 'dot ' + (data.status === 'healthy' ? 'up' : data.status === 'degraded' ? 'up' : 'down');
-    text.textContent = `${data.status} · pg ${data.dependencies.postgres.status} · redis ${data.dependencies.redis.status}`;
-  } catch (e) {
-    dot.className = 'dot down';
-    text.textContent = 'unreachable — check API URL / CORS';
-  }
-}
-
-async function indexDocument() {
-  const title = $('doc-title').value.trim();
-  const content = $('doc-content').value.trim();
-  const category = $('doc-category').value.trim();
-  const msg = $('index-msg');
-  msg.className = 'msg';
-
-  if (!title || !content) {
-    msg.textContent = 'Title and content are required.';
-    msg.className = 'msg err show';
-    return;
-  }
-
-  $('index-btn').disabled = true;
-  try {
-    const res = await fetch(`${baseUrl()}/documents`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Tenant-ID': tenant() },
-      body: JSON.stringify({ title, content, metadata: category ? { category } : {} })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || data.error || 'Request failed');
-    msg.textContent = `Indexed — id ${data.id.slice(0, 8)}…`;
-    msg.className = 'msg ok show';
-    $('doc-title').value = '';
-    $('doc-content').value = '';
-    $('doc-category').value = '';
-    if ($('search-input').value.trim()) runSearch();
-  } catch (e) {
-    msg.textContent = e.message;
-    msg.className = 'msg err show';
-  } finally {
-    $('index-btn').disabled = false;
-  }
-}
-
-let searchDebounce;
-function scheduleSearch() {
-  clearTimeout(searchDebounce);
-  searchDebounce = setTimeout(runSearch, 300);
-}
-
-async function runSearch() {
-  const q = $('search-input').value.trim();
-  const results = $('results');
-  const meta = $('search-meta');
-
-  if (!q) { results.innerHTML = ''; meta.textContent = ''; return; }
-
-  try {
-    const res = await fetch(`${baseUrl()}/search?q=${encodeURIComponent(q)}&limit=20`, {
-      headers: { 'X-Tenant-ID': tenant() }
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || data.error || 'Search failed');
-
-    meta.innerHTML = `<b>${data.total_results}</b> result${data.total_results === 1 ? '' : 's'} for tenant <b>${escapeHtml(tenant())}</b> · ${data.took_ms}ms ${data.cached ? '· cached' : ''}`;
-
-    if (data.results.length === 0) {
-      results.innerHTML = '<div class="empty">No matches. Try a different term, or index a document below.</div>';
-      return;
-    }
-
-    results.innerHTML = data.results.map(r => `
-      <div class="result">
-        <div class="result-head">
-          <div class="result-title">${escapeHtml(r.title)}</div>
-          <div class="result-score">score ${r.score.toFixed(3)}</div>
+    <header>
+        <div class="header-row">
+            <h1><span class="brand-name">Doc<em>Search</em></span><span class="brand-tag">console</span></h1>
+            <button class="settings-toggle" id="settings-toggle" aria-expanded="false" aria-controls="header-settings">Settings</button>
         </div>
-        <div class="result-snippet">${r.snippet}</div>
-        <div class="result-foot">
-          <span>${r.id}</span>
-          <button class="btn-ghost" onclick="deleteDoc('${r.id}')">Delete</button>
+        <div class="header-settings" id="header-settings">
+            <span class="status-pill"><span class="dot" id="health-dot"></span><span id="health-text">checking…</span></span>
+            <label>API URL <input id="base-url" value=""></label>
+            <label>Tenant <input id="tenant-id" value="tenant-acme"></label>
+            <a href="/architecture" class="icon-link">Architecture ↗</a>
+            <a href="https://console.neon.tech" target="_blank" rel="noopener" class="icon-link">DB console ↗</a>
         </div>
-      </div>
-    `).join('');
-  } catch (e) {
-    meta.textContent = '';
-    results.innerHTML = `<div class="empty">${escapeHtml(e.message)}</div>`;
-  }
-}
+    </header>
 
-async function deleteDoc(id) {
-  try {
-    const res = await fetch(`${baseUrl()}/documents/${id}`, {
-      method: 'DELETE',
-      headers: { 'X-Tenant-ID': tenant() }
-    });
-    if (res.status !== 204) throw new Error('Delete failed');
-    runSearch();
-  } catch (e) {
-    alert(e.message);
-  }
-}
+    <div class="layout">
+        <div class="panel panel-search">
+            <p class="section-label">search</p>
+            <div class="search-row">
+                <input id="search-input" placeholder="Search this tenant's documents…" autofocus>
+            </div>
+            <div class="search-meta" id="search-meta"></div>
+            <div id="results"></div>
+        </div>
 
-$('index-btn').addEventListener('click', indexDocument);
-$('search-input').addEventListener('input', scheduleSearch);
-$('base-url').addEventListener('change', checkHealth);
-$('tenant-id').addEventListener('change', () => { if ($('search-input').value.trim()) runSearch(); });
+        <div class="panel panel-index">
+            <p class="section-label">index a document</p>
+            <div class="field">
+                <label for="doc-title">Title</label>
+                <input id="doc-title" placeholder="Q3 Financial Report">
+            </div>
+            <div class="field">
+                <label for="doc-content">Content</label>
+                <textarea id="doc-content" placeholder="Revenue grew 12% quarter over quarter, driven by..."></textarea>
+            </div>
+            <div class="field">
+                <label for="doc-category">Category (metadata, optional)</label>
+                <input id="doc-category" placeholder="engineering">
+            </div>
+            <button class="btn-primary" id="index-btn" style="width:100%">Index document</button>
+            <div class="msg" id="index-msg"></div>
+        </div>
+    </div>
 
-checkHealth();
-setInterval(checkHealth, 15000);
-</script>
+    <script>
+        const $ = (id) => document.getElementById(id);
+        const baseUrl = () => $('base-url').value.replace(/\/$/, '');
+        const tenant = () => $('tenant-id').value.trim();
+
+        // Auto-detect: use whatever origin actually served this page, so the
+        // console works correctly out of the box whether it's opened at
+        // localhost:8000/ui or https://your-app.onrender.com/ui -- no manual
+        // editing needed. Still overridable by typing a different URL.
+        $('base-url').value = window.location.origin;
+
+        function escapeHtml(s) {
+            return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        const settingsToggle = $('settings-toggle');
+        const headerSettings = $('header-settings');
+        settingsToggle.addEventListener('click', () => {
+            const isOpen = headerSettings.classList.toggle('open');
+            settingsToggle.setAttribute('aria-expanded', String(isOpen));
+            settingsToggle.textContent = isOpen ? 'Close' : 'Settings';
+        });
+
+        async function checkHealth() {
+            const dot = $('health-dot'), text = $('health-text');
+            try {
+                const res = await fetch(`${baseUrl()}/health`);
+                const data = await res.json();
+                dot.className = 'dot ' + (data.status === 'healthy' ? 'up' : data.status === 'degraded' ? 'up' : 'down');
+                text.textContent = `${data.status} · pg ${data.dependencies.postgres.status} · redis ${data.dependencies.redis.status}`;
+            } catch (e) {
+                dot.className = 'dot down';
+                text.textContent = 'unreachable — check API URL / CORS';
+            }
+        }
+
+        async function indexDocument() {
+            const title = $('doc-title').value.trim();
+            const content = $('doc-content').value.trim();
+            const category = $('doc-category').value.trim();
+            const msg = $('index-msg');
+            msg.className = 'msg';
+
+            if (!title || !content) {
+                msg.textContent = 'Title and content are required.';
+                msg.className = 'msg err show';
+                return;
+            }
+
+            $('index-btn').disabled = true;
+            try {
+                const res = await fetch(`${baseUrl()}/documents`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Tenant-ID': tenant() },
+                    body: JSON.stringify({ title, content, metadata: category ? { category } : {} })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || data.error || 'Request failed');
+                msg.textContent = `Indexed — id ${data.id.slice(0, 8)}…`;
+                msg.className = 'msg ok show';
+                $('doc-title').value = '';
+                $('doc-content').value = '';
+                $('doc-category').value = '';
+                if ($('search-input').value.trim()) runSearch();
+            } catch (e) {
+                msg.textContent = e.message;
+                msg.className = 'msg err show';
+            } finally {
+                $('index-btn').disabled = false;
+            }
+        }
+
+        let searchDebounce;
+        function scheduleSearch() {
+            clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(runSearch, 300);
+        }
+
+        async function runSearch() {
+            const q = $('search-input').value.trim();
+            const results = $('results');
+            const meta = $('search-meta');
+
+            if (!q) { results.innerHTML = ''; meta.textContent = ''; return; }
+
+            try {
+                const res = await fetch(`${baseUrl()}/search?q=${encodeURIComponent(q)}&limit=20`, {
+                    headers: { 'X-Tenant-ID': tenant() }
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || data.error || 'Search failed');
+
+                meta.innerHTML = `<b>${data.total_results}</b> result${data.total_results === 1 ? '' : 's'} for tenant <b>${escapeHtml(tenant())}</b> · ${data.took_ms}ms ${data.cached ? '· cached' : ''}`;
+
+                if (data.results.length === 0) {
+                    results.innerHTML = '<div class="empty">No matches. Try a different term, or index a document below.</div>';
+                    return;
+                }
+
+                results.innerHTML = data.results.map(r => `
+          <div class="result">
+            <div class="result-head">
+              <div class="result-title">${escapeHtml(r.title)}</div>
+              <div class="result-score">score ${r.score.toFixed(3)}</div>
+            </div>
+            <div class="result-snippet">${r.snippet}</div>
+            <div class="result-foot">
+              <span>${r.id}</span>
+              <button class="btn-ghost" onclick="deleteDoc('${r.id}')">Delete</button>
+            </div>
+          </div>
+        `).join('');
+            } catch (e) {
+                meta.textContent = '';
+                results.innerHTML = `<div class="empty">${escapeHtml(e.message)}</div>`;
+            }
+        }
+
+        async function deleteDoc(id) {
+            try {
+                const res = await fetch(`${baseUrl()}/documents/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'X-Tenant-ID': tenant() }
+                });
+                if (res.status !== 204) throw new Error('Delete failed');
+                runSearch();
+            } catch (e) {
+                alert(e.message);
+            }
+        }
+
+        $('index-btn').addEventListener('click', indexDocument);
+        $('search-input').addEventListener('input', scheduleSearch);
+        $('base-url').addEventListener('change', checkHealth);
+        $('tenant-id').addEventListener('change', () => { if ($('search-input').value.trim()) runSearch(); });
+
+        checkHealth();
+        setInterval(checkHealth, 15000);
+    </script>
 
 </body>
 </html>
