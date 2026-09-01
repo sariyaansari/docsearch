@@ -1,0 +1,68 @@
+{
+  "info": {
+    "name": "Distributed Document Search Service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "tenant_id", "value": "tenant-acme" },
+    { "key": "doc_id", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/health"
+      }
+    },
+    {
+      "name": "Index Document",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-Tenant-ID", "value": "{{tenant_id}}" }
+        ],
+        "url": "{{base_url}}/documents",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Distributed Systems Design Patterns\",\n  \"content\": \"This document covers caching strategies, database sharding, consistent hashing, and circuit breaker patterns.\",\n  \"metadata\": {\"category\": \"engineering\"}\n}"
+        }
+      }
+    },
+    {
+      "name": "Search Documents",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "X-Tenant-ID", "value": "{{tenant_id}}" }],
+        "url": {
+          "raw": "{{base_url}}/search?q=distributed caching&limit=10&offset=0",
+          "host": ["{{base_url}}"],
+          "path": ["search"],
+          "query": [
+            { "key": "q", "value": "distributed caching" },
+            { "key": "limit", "value": "10" },
+            { "key": "offset", "value": "0" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Document by ID",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "X-Tenant-ID", "value": "{{tenant_id}}" }],
+        "url": "{{base_url}}/documents/{{doc_id}}"
+      }
+    },
+    {
+      "name": "Delete Document",
+      "request": {
+        "method": "DELETE",
+        "header": [{ "key": "X-Tenant-ID", "value": "{{tenant_id}}" }],
+        "url": "{{base_url}}/documents/{{doc_id}}"
+      }
+    }
+  ]
+}

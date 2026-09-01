@@ -1,0 +1,76 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: docsearch-postgres
+    environment:
+      POSTGRES_USER: docsearch
+      POSTGRES_PASSWORD: docsearch
+      POSTGRES_DB: docsearch
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docsearch"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: docsearch-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: docsearch-app
+    environment:
+      DATABASE_URL: postgresql://docsearch:docsearch@postgres:5432/docsearch
+      REDIS_URL: redis://redis:6379/0
+      ENVIRONMENT: development
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # For active development, mount source and enable --reload instead:
+    # volumes: ["./app:/app/app"]
+    # command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  # Optional: run 2 app replicas behind a lightweight LB to demonstrate
+  # horizontal scalability locally. Start with: docker compose --profile scale up
+  app-2:
+    build: .
+    container_name: docsearch-app-2
+    profiles: ["scale"]
+    environment:
+      DATABASE_URL: postgresql://docsearch:docsearch@postgres:5432/docsearch
+      REDIS_URL: redis://redis:6379/0
+      ENVIRONMENT: development
+    ports:
+      - "8001:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  adminer:
+    image: adminer:latest
+    container_name: docsearch-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:
