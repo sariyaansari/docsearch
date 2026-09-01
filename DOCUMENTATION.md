@@ -2,13 +2,15 @@
 
 **Author:** _[Your Name]_
 **Date:** _[Submission Date]_
-**Repo:** _[GitHub link]_ · **Live demo:** _[Deployed URL]_
+**Repo:** https://github.com/sariyaansari/docsearch · **Live demo:** https://docsearch-35e7.onrender.com
 
 ---
 
 ## Table of Contents
 
 1. [Architecture Design](#1-architecture-design)
+   - 1.1–1.8 System design, storage, API, consistency, caching, message queue, multi-tenancy
+   - [1.9 Operational Tooling](#19-operational-tooling-local--cloud)
 2. [Production Readiness Analysis](#2-production-readiness-analysis)
 3. [Enterprise Experience Showcase](#3-enterprise-experience-showcase)
 4. [AI Tool Usage Note](#4-ai-tool-usage-note)
@@ -19,42 +21,7 @@
 
 ### 1.1 High-Level System Architecture
 
-```
-                                   ┌─────────────────────┐
-                                   │   Client / API       │
-                                   │   Consumer            │
-                                   └──────────┬───────────┘
-                                              │ HTTPS
-                                   ┌──────────▼───────────┐
-                                   │   API Gateway /       │
-                                   │   Load Balancer       │   ← TLS termination, auth
-                                   │  (ALB / Nginx / Kong) │     validation happens here
-                                   └──────────┬───────────┘     in production
-                                              │
-                        ┌─────────────────────┼─────────────────────┐
-                        │                     │                     │
-                 ┌──────▼──────┐       ┌──────▼──────┐       ┌──────▼──────┐
-                 │  App        │       │  App        │       │  App        │
-                 │  Instance 1 │  ...  │  Instance 2 │  ...  │  Instance N │  ← stateless,
-                 │  (FastAPI)  │       │  (FastAPI)  │       │  (FastAPI)  │    horizontally
-                 └──────┬──────┘       └──────┬──────┘       └──────┬──────┘    scaled
-                        │                     │                     │
-          ┌─────────────┼─────────────────────┼─────────────────────┤
-          │             │                     │                     │
-   ┌──────▼──────┐ ┌────▼────────┐    ┌───────▼───────┐     ┌───────▼───────┐
-   │  Redis       │ │  Postgres    │    │  Message Queue │     │  Object       │
-   │  (cache +    │ │  Primary     │    │  (Kafka/SQS)   │     │  Storage      │
-   │  rate limit) │ │  + Replicas  │    │  async indexing│     │  (S3-compat)  │
-   └──────────────┘ └───────┬──────┘    └───────┬────────┘     └───────────────┘
-                            │                    │
-                     ┌──────▼──────┐     ┌───────▼────────┐
-                     │  Search      │◄────│  Indexing       │
-                     │  Index       │     │  Workers        │
-                     │  (Postgres   │     │  (consume from  │
-                     │  GIN / or ES)│     │  queue, write   │
-                     └──────────────┘     │  to index)      │
-                                          └─────────────────┘
-```
+![Prototype architecture: client through load balancer to a stateless, horizontally scaled app tier, backed by Redis and Postgres](docs/architecture-diagram.svg)
 
 **Component roles:**
 
@@ -111,6 +78,8 @@ Client → GET /search?q=...&tenant=...
 | Best fit | ≤ a few tens of millions of rows, team wants one less system | 10M+ docs, heavy query load, dedicated search team |
 
 **Decision for this exercise:** Postgres FTS, because (a) the assignment's own volume target (10M+ documents) is within Postgres FTS's comfortable range if indexed and tuned correctly, (b) it lets the prototype run entirely on free-tier infrastructure with zero extra moving parts, and (c) it keeps the write path simpler (no dual-write consistency problem between DB and search index). **For a genuine 100M+ document, sub-100ms-p99, multi-region deployment, I would migrate the search index to Elasticsearch/OpenSearch** while keeping Postgres as the system of record — this is a well-trodden pattern (CDC from Postgres → Kafka → Elasticsearch indexer) and is discussed further in Section 2.
+
+![Production-scale extension: Postgres feeds a change-data-capture stream into Kafka, consumed by indexing workers that keep Elasticsearch in sync for search traffic](docs/production-scale-diagram.svg)
 
 **Database:** PostgreSQL, chosen for ACID guarantees on the document metadata (source of truth), native JSONB for flexible per-tenant metadata without a rigid schema migration for every new field, and because it can serve both as the OLTP store and (via GIN indexes) the search index in one system for this scale.
 
@@ -236,6 +205,14 @@ Not present in the prototype (Postgres FTS's synchronous generated column makes 
 3. **Index layer**: `tenant_id` is the leading column in the composite `(tenant_id, id)` index, so tenant-scoped queries are always fast, never full-table scans.
 4. **Rate limiting**: per-tenant, so one noisy tenant can't degrade the shared infrastructure for others (implemented in prototype via Redis).
 
+### 1.9 Operational Tooling (Local & Cloud)
+
+Beyond the API itself, the project includes tooling for validating and demonstrating the system without requiring a separate frontend build:
+
+- **Visual search console** (`/ui`, served directly by the FastAPI app from `app/static/search-ui.html`) — lets anyone index documents and run live, highlighted searches from a browser, locally or against the deployed instance, with no separate install. A standalone copy of the same file also exists at the repo root for pointing at any environment by editing its API URL field.
+- **Adminer** (local only, via `docker-compose.yml`) — a lightweight Postgres web UI for browsing the raw `documents` table, useful for demonstrating the `tenant_id` column and the generated `search_vector` column directly. **Deliberately not deployed to the cloud environment** — exposing a database login page on a public URL is unnecessary risk for a demo; the equivalent capability in production is Neon's own built-in SQL Editor, reached through an authenticated console login rather than an open port.
+- **Seed & benchmark script** (`scripts/seed_and_benchmark.py`) — generates realistic sample documents and measures real p50/p95/p99 search latency (see §2.5 for results from an actual run).
+
 ---
 
 ## 2. Production Readiness Analysis
@@ -322,7 +299,8 @@ _[Your answer here]_
 This prototype and documentation were developed with Claude (Anthropic) as an AI pair-programming assistant, per the assignment's explicit encouragement to use AI tools. Specifics:
 
 - **Code generation:** the FastAPI application structure, Postgres schema (including the generated `tsvector` column and GIN/trigram indexes), Redis-backed caching and rate-limiting logic, and Docker Compose setup were drafted with Claude and then **run and verified end-to-end** in a live sandbox — not just generated and assumed correct. This included catching and fixing a real bug (asyncpg returning JSONB columns as raw strings rather than parsed dicts, which broke document creation) through an actual test-and-fix cycle.
+- **Visual tooling:** the `/ui` search console and the architecture diagrams embedded in this document (§1.1, §1.3) were built with Claude; the diagrams specifically were rendered to images and visually inspected for overlap/layout errors before being committed, not accepted sight-unseen.
 - **Benchmarking:** the seed/benchmark script was written with Claude, then executed against the running service to produce the real latency figures cited in Section 2.5 (including the connection-pool-sizing finding) — these are measured numbers from an actual run, not estimates.
-- **Documentation:** this document's structure and first drafts were produced with Claude, then reviewed and should be further edited by you to reflect your own voice and — critically — your own real experience in Section 3, which Claude did not and should not fabricate.
-- **Deployment automation:** `deploy/deploy.sh` (provisioning Neon/Upstash/Render via their APIs) was drafted with Claude using each provider's current API documentation, and its JSON payload construction and idempotent env-file write-back logic were tested against mocked API responses in a live sandbox. **The cloud-provisioning calls themselves (Neon/Upstash/Render) could not be executed end-to-end in that sandbox** (its network egress is restricted to package registries), so unlike the core application, this script has not been verified against the real APIs — I reviewed it carefully and it matches the documented request/response shapes, but you should treat the first real run as a test, watch its output, and be ready to fall back to the manual dashboard steps in the README if a provider's API has since changed.
+- **Deployment:** the free-tier cloud deployment (Neon, Upstash, Render) was completed interactively with Claude across account creation, credential handling, a Windows Docker Desktop/WSL2 startup issue, Git/GitHub setup, and Render's service configuration — with Claude reading actual terminal output, error messages, and dashboard screenshots at each step. The `deploy/deploy.sh` automation script was also written with Claude, but its cloud-provisioning API calls could not be executed inside Claude's own sandbox (network-restricted to package registries), so the live deployment was ultimately completed via each provider's manual dashboard flow instead, with the script kept in the repo as a documented, not-yet-independently-verified alternative path.
+- **Documentation:** this document's structure and first drafts were produced with Claude, then revised over the course of the project as components were added (the `/ui` console, Adminer, deployment tooling, diagrams), and should be further edited by you to reflect your own voice and — critically — your own real experience in Section 3, which Claude did not and should not fabricate.
 - **What I (the candidate) did:** _[Describe your own review, edits, and any manual changes/testing you did beyond what's above — be specific and honest, since this section is itself part of what's being evaluated.]_

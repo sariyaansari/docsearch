@@ -160,7 +160,12 @@ docsearch/
 │   ├── repository.py    # Document CRUD + search queries
 │   ├── search_cache.py  # Search result cache-aside logic
 │   ├── tenancy.py       # Tenant resolution dependency
-│   └── schemas.py       # Pydantic request/response models
+│   ├── schemas.py       # Pydantic request/response models
+│   └── static/
+│       └── search-ui.html  # served at GET /ui by the app itself
+├── docs/
+│   ├── architecture-diagram.svg       # embedded in DOCUMENTATION.md §1.1
+│   └── production-scale-diagram.svg   # embedded in DOCUMENTATION.md §1.3
 ├── scripts/
 │   ├── sample_requests.sh
 │   ├── postman_collection.json
@@ -168,7 +173,7 @@ docsearch/
 ├── docker-compose.yml
 ├── Dockerfile
 ├── render.yaml
-├── search-ui.html         # standalone visual search console (open directly in browser)
+├── search-ui.html         # standalone copy of the same console; point its API URL field at any environment
 ├── deploy/
 │   ├── deploy.sh              # automated local + cloud deployment script
 │   └── .env.deploy.example    # credentials template (copy to .env.deploy)
