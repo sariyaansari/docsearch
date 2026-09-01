@@ -25,7 +25,9 @@ docker compose up --build
 
 The API is now live at `http://localhost:8000`. Interactive docs: `http://localhost:8000/docs`.
 
-**Visual search console:** open `http://localhost:8000/ui` in your browser — the API serves this directly, so there's nothing separate to open or locate. Index documents and search with live, highlighted results, no command line needed.
+**Visual search console:** open `http://localhost:8000/ui` in your browser — the API serves this directly, so there's nothing separate to open or locate. Index documents and search with live, highlighted results, no command line needed. Responsive down to mobile — the settings (API URL, tenant, links) collapse behind a "Settings" button on narrow screens.
+
+**Architecture & design documentation, from the UI itself:** click "Architecture ↗" in the console header, or go directly to `http://localhost:8000/architecture`. This is a client-safe view of the design — the same architecture/production-readiness content as `DOCUMENTATION.md`, served by the app itself with embedded diagrams, and **deliberately excluding the GitHub repo link, deployment URL, and the personal experience-showcase section** — useful for sharing a look at the design before you're ready to share repo access.
 
 (A standalone copy also exists at `search-ui.html` in this repo, which works the same way if opened directly as a file — useful if you want to point it at a different environment, like a deployed URL, by editing its "API URL" field.)
 

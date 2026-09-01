@@ -6,6 +6,7 @@ from uuid import UUID
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.cache import close_redis, get_redis
 from app.config import settings
@@ -224,6 +225,23 @@ async def search_console():
     return FileResponse(Path(__file__).parent / "static" / "search-ui.html")
 
 
+@app.get("/architecture", tags=["ops"])
+async def architecture_docs():
+    """Client-facing architecture & design documentation, served directly
+    by the API. Deliberately excludes the repo URL, deployment URL, and the
+    personal experience-showcase section -- this is a public-safe view of
+    the design, not the full internal DOCUMENTATION.md."""
+    return FileResponse(Path(__file__).parent / "static" / "architecture.html")
+
+
+# Serves the diagram SVGs referenced by /architecture.
+app.mount(
+    "/static/diagrams",
+    StaticFiles(directory=Path(__file__).parent / "static" / "diagrams"),
+    name="diagrams",
+)
+
+
 @app.get("/", tags=["ops"])
 async def root():
     return {
@@ -231,4 +249,5 @@ async def root():
         "status": "running",
         "docs": "/docs",
         "ui": "/ui",
+        "architecture": "/architecture",
     }
