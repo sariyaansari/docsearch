@@ -1,191 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Architecture &amp; design — Document Search</title>
-<style>
-  :root {
-    --paper: #faf9f6;
-    --ink: #1c1b19;
-    --ink-soft: #6b6862;
-    --line: #ddd9d1;
-    --accent: #2f5d5a;
-    --accent-soft: #e4ece9;
-    --sans: 'IBM Plex Sans', -apple-system, Segoe UI, sans-serif;
-    --mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--sans);
-    line-height: 1.65;
-  }
-  header {
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--line);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    position: sticky;
-    top: 0;
-    background: var(--paper);
-    z-index: 10;
-  }
-  header h1 {
-    font-family: var(--mono);
-    font-size: 15px;
-    font-weight: 600;
-    margin: 0;
-  }
-  header h1 span { color: var(--accent); }
-  .back-link {
-    font-family: var(--mono);
-    font-size: 12.5px;
-    color: var(--accent);
-    text-decoration: none;
-    border: 1px solid var(--line);
-    padding: 7px 12px;
-    border-radius: 6px;
-    white-space: nowrap;
-    min-height: 32px;
-    display: inline-flex;
-    align-items: center;
-  }
-  .back-link:hover { background: var(--accent-soft); }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture &amp; design — Document Search</title>
+    <style>
+        :root {
+            --paper: #faf9f6;
+            --ink: #1c1b19;
+            --ink-soft: #6b6862;
+            --line: #ddd9d1;
+            --accent: #2f5d5a;
+            --accent-soft: #e4ece9;
+            --sans: 'IBM Plex Sans', -apple-system, Segoe UI, sans-serif;
+            --mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+        }
 
-  main {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 32px 24px 80px;
-  }
-  h2 {
-    font-size: 22px;
-    font-weight: 600;
-    margin: 48px 0 8px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid var(--ink);
-  }
-  h2:first-child { margin-top: 0; }
-  h3 {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 32px 0 10px;
-    color: var(--accent);
-  }
-  p { margin: 12px 0; font-size: 15px; }
-  ul, ol { font-size: 15px; padding-left: 22px; }
-  li { margin: 6px 0; }
-  strong { font-weight: 600; }
-  code {
-    font-family: var(--mono);
-    background: var(--accent-soft);
-    padding: 1px 6px;
-    border-radius: 4px;
-    font-size: 0.88em;
-  }
-  pre {
-    background: #22211d;
-    color: #e8e6df;
-    padding: 16px 18px;
-    border-radius: 8px;
-    overflow-x: auto;
-    font-size: 12.5px;
-    line-height: 1.6;
-  }
-  pre code { background: none; padding: 0; color: inherit; }
-  img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 20px auto;
-    border-radius: 8px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 16px 0;
-    font-size: 13.5px;
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-  th, td {
-    border: 1px solid var(--line);
-    padding: 8px 12px;
-    text-align: left;
-    white-space: normal;
-  }
-  th {
-    background: var(--accent-soft);
-    color: var(--accent);
-    font-weight: 600;
-  }
-  hr { border: none; border-top: 1px solid var(--line); margin: 40px 0; }
+        * {
+            box-sizing: border-box;
+        }
 
-  @media (max-width: 640px) {
-    header { padding: 14px 16px; }
-    header h1 { font-size: 13px; }
-    main { padding: 20px 16px 60px; }
-    h2 { font-size: 19px; margin-top: 36px; }
-    p, ul, ol { font-size: 14px; }
-    table { font-size: 12.5px; }
-  }
-</style>
+        body {
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: var(--sans);
+            line-height: 1.65;
+        }
+
+        header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            background: var(--paper);
+            z-index: 10;
+        }
+
+            header h1 {
+                font-family: var(--mono);
+                font-size: 15px;
+                font-weight: 600;
+                margin: 0;
+            }
+
+                header h1 span {
+                    color: var(--accent);
+                }
+
+        .back-link {
+            font-family: var(--mono);
+            font-size: 12.5px;
+            color: var(--accent);
+            text-decoration: none;
+            border: 1px solid var(--line);
+            padding: 7px 12px;
+            border-radius: 6px;
+            white-space: nowrap;
+            min-height: 32px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+            .back-link:hover {
+                background: var(--accent-soft);
+            }
+
+        main {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 32px 24px 80px;
+        }
+
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin: 48px 0 8px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--ink);
+        }
+
+            h2:first-child {
+                margin-top: 0;
+            }
+
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 32px 0 10px;
+            color: var(--accent);
+        }
+
+        p {
+            margin: 12px 0;
+            font-size: 15px;
+        }
+
+        ul, ol {
+            font-size: 15px;
+            padding-left: 22px;
+        }
+
+        li {
+            margin: 6px 0;
+        }
+
+        strong {
+            font-weight: 600;
+        }
+
+        code {
+            font-family: var(--mono);
+            background: var(--accent-soft);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 0.88em;
+        }
+
+        pre {
+            background: #22211d;
+            color: #e8e6df;
+            padding: 16px 18px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 12.5px;
+            line-height: 1.6;
+        }
+
+            pre code {
+                background: none;
+                padding: 0;
+                color: inherit;
+            }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 13.5px;
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        th, td {
+            border: 1px solid var(--line);
+            padding: 8px 12px;
+            text-align: left;
+            white-space: normal;
+        }
+
+        th {
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--line);
+            margin: 40px 0;
+        }
+
+        @media (max-width: 640px) {
+            header {
+                padding: 14px 16px;
+            }
+
+                header h1 {
+                    font-size: 13px;
+                }
+
+            main {
+                padding: 20px 16px 60px;
+            }
+
+            h2 {
+                font-size: 19px;
+                margin-top: 36px;
+            }
+
+            p, ul, ol {
+                font-size: 14px;
+            }
+
+            table {
+                font-size: 12.5px;
+            }
+        }
+    </style>
 </head>
 <body>
-<header>
-  <h1>document<span>search</span>/architecture</h1>
-  <a href="/ui" class="back-link">← Back to console</a>
-</header>
-<main>
-<h2>1. Architecture Design</h2>
-<h3>1.1 High-Level System Architecture</h3>
-<p><img alt="Prototype architecture: client through load balancer to a stateless, horizontally scaled app tier, backed by Redis and Postgres" src="/static/diagrams/architecture-diagram.svg" /></p>
-<p><strong>Component roles:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Component</th>
-<th>Role</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>API Gateway / LB</td>
-<td>TLS termination, routing, coarse-grained auth (JWT validation), tenant-header injection</td>
-</tr>
-<tr>
-<td>App instances</td>
-<td>Stateless FastAPI services — horizontally scaled behind the LB, no local state</td>
-</tr>
-<tr>
-<td>Redis</td>
-<td>Two jobs: (1) search-result cache, (2) per-tenant rate-limit counters</td>
-</tr>
-<tr>
-<td>Postgres (primary + read replicas)</td>
-<td>System of record + full-text search index (GIN over <code>tsvector</code>)</td>
-</tr>
-<tr>
-<td>Message queue</td>
-<td>Decouples document ingestion from indexing — absorbs write bursts, enables retry/backoff on failure</td>
-</tr>
-<tr>
-<td>Indexing workers</td>
-<td>Consume from queue, write to the search index, isolated failure domain from the write API</td>
-</tr>
-<tr>
-<td>Object storage</td>
-<td>Original document blobs (if documents are large files, not just text) — not needed for the text-only prototype but part of the realistic production picture</td>
-</tr>
-</tbody>
-</table>
-<h3>1.2 Data Flow Diagrams</h3>
-<p><strong>Indexing (write) path:</strong></p>
+    <header>
+        <h1>document<span>search</span>/architecture</h1>
+        <a href="/ui" class="back-link">← Back to console</a>
+    </header>
+    <main>
+        <h2>1. Architecture Design</h2>
+        <h3>1.1 High-Level System Architecture</h3>
+        <p><img alt="Prototype architecture: client through load balancer to a stateless, horizontally scaled app tier, backed by Redis and Postgres" src="/static/diagrams/architecture-diagram.svg" /></p>
+        <p><strong>Component roles:</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>API Gateway / LB</td>
+                    <td>TLS termination, routing, coarse-grained auth (JWT validation), tenant-header injection</td>
+                </tr>
+                <tr>
+                    <td>App instances</td>
+                    <td>Stateless FastAPI services — horizontally scaled behind the LB, no local state</td>
+                </tr>
+                <tr>
+                    <td>Redis</td>
+                    <td>Two jobs: (1) search-result cache, (2) per-tenant rate-limit counters</td>
+                </tr>
+                <tr>
+                    <td>Postgres (primary + read replicas)</td>
+                    <td>System of record + full-text search index (GIN over <code>tsvector</code>)</td>
+                </tr>
+                <tr>
+                    <td>Message queue</td>
+                    <td>Decouples document ingestion from indexing — absorbs write bursts, enables retry/backoff on failure</td>
+                </tr>
+                <tr>
+                    <td>Indexing workers</td>
+                    <td>Consume from queue, write to the search index, isolated failure domain from the write API</td>
+                </tr>
+                <tr>
+                    <td>Object storage</td>
+                    <td>Original document blobs (if documents are large files, not just text) — not needed for the text-only prototype but part of the realistic production picture</td>
+                </tr>
+            </tbody>
+        </table>
+        <h3>1.2 Data Flow Diagrams</h3>
+        <p><strong>Sequence diagram — indexing (write) and search (read) paths, showing every hop between Client, FastAPI, Redis, and Postgres:</strong></p>
+        <p><img alt="Sequence diagram: POST /documents indexing flow and GET /search flow with cache hit/miss branching, across Client, FastAPI, Redis Rate Limiter, Redis Cache, and Postgres" src="/static/diagrams/sequence-diagram-ingestion-search.png" /></p>
+        <p><strong>Decision-flow diagram — all 4 endpoints, including every branch (rate-limit rejection, cache hit/miss, tenant-not-found):</strong></p>
+        <p><img alt="Flowchart showing all four endpoints (POST /documents, GET /search, GET /documents/id, DELETE /documents/id) with their success and failure branches, gated by tenant resolution and rate limiting" src="/static/diagrams/flow-diagram-endpoints.png" /></p>
+        <p><strong>Indexing (write) path — narrative:</strong></p>
 <pre><code>Client → POST /documents
    → API validates payload + tenant
    → App writes document row to Postgres (source of truth) — synchronous, gets an ID back immediately
@@ -194,8 +265,8 @@
    → Indexing worker consumes event → computes tsvector (or pushes to Elasticsearch)
    → On failure: message retried with exponential backoff; after N attempts → dead-letter queue for manual/automated replay
 </code></pre>
-<p><em>Note: the prototype simplifies this — Postgres's <code>GENERATED ALWAYS AS ... STORED</code> column computes the <code>tsvector</code> synchronously on insert, since Postgres FTS doesn't need a separate indexing pass. The async queue step above is the production design for when the search engine is a </em><em>separate system</em><em> (e.g. Elasticsearch) that must be kept in sync with the source-of-truth database — see 1.3 for that trade-off discussion.</em></p>
-<p><strong>Search (read) path:</strong></p>
+        <p><em>Note: the prototype simplifies this — Postgres's <code>GENERATED ALWAYS AS ... STORED</code> column computes the <code>tsvector</code> synchronously on insert, since Postgres FTS doesn't need a separate indexing pass. The async queue step above is the production design for when the search engine is a </em><em>separate system</em><em> (e.g. Elasticsearch) that must be kept in sync with the source-of-truth database — see 1.3 for that trade-off discussion.</em></p>
+        <p><strong>Search (read) path — narrative:</strong></p>
 <pre><code>Client → GET /search?q=...&amp;tenant=...
    → App checks Redis cache (key = hash(tenant_id, query, limit, offset))
    → Cache hit  → return cached results (few ms)
@@ -204,100 +275,102 @@
                 → write result to Redis with short TTL
                 → return to client
 </code></pre>
-<h3>1.3 Storage Strategy: Search Engine, Database, Cache</h3>
-<p><strong>Search engine choice — Postgres FTS (prototype) vs. Elasticsearch (production-scale):</strong></p>
-<table>
-<thead>
-<tr>
-<th>Criterion</th>
-<th>PostgreSQL FTS</th>
-<th>Elasticsearch</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Operational overhead</td>
-<td>None — same DB you already run</td>
-<td>Separate cluster to operate, monitor, upgrade</td>
-</tr>
-<tr>
-<td>Cost to run for a prototype/demo</td>
-<td>$0 (free-tier Postgres)</td>
-<td>No good permanent free tier</td>
-</tr>
-<tr>
-<td>Relevance ranking sophistication</td>
-<td>Good (<code>ts_rank_cd</code>, weighted fields)</td>
-<td>Better (BM25, custom scoring, ML re-ranking)</td>
-</tr>
-<tr>
-<td>Horizontal scalability of the index itself</td>
-<td>Limited — scales with the DB (read replicas help reads, not write-side index sharding)</td>
-<td>Native sharding across nodes, built for this</td>
-</tr>
-<tr>
-<td>Faceted search / aggregations at scale</td>
-<td>Workable via SQL <code>GROUP BY</code>, degrades at very large N</td>
-<td>First-class, fast at scale</td>
-</tr>
-<tr>
-<td>Fuzzy / typo-tolerant search</td>
-<td><code>pg_trgm</code> similarity — good enough for moderate scale</td>
-<td>Native fuzzy matching, more tunable</td>
-</tr>
-<tr>
-<td>Best fit</td>
-<td>≤ a few tens of millions of rows, team wants one less system</td>
-<td>10M+ docs, heavy query load, dedicated search team</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Decision for this exercise:</strong> Postgres FTS, because (a) the assignment's own volume target (10M+ documents) is within Postgres FTS's comfortable range if indexed and tuned correctly, (b) it lets the prototype run entirely on free-tier infrastructure with zero extra moving parts, and (c) it keeps the write path simpler (no dual-write consistency problem between DB and search index). <strong>For a genuine 100M+ document, sub-100ms-p99, multi-region deployment, I would migrate the search index to Elasticsearch/OpenSearch</strong> while keeping Postgres as the system of record — this is a well-trodden pattern (CDC from Postgres → Kafka → Elasticsearch indexer) and is discussed further in Section 2.</p>
-<p><img alt="Production-scale extension: Postgres feeds a change-data-capture stream into Kafka, consumed by indexing workers that keep Elasticsearch in sync for search traffic" src="/static/diagrams/production-scale-diagram.svg" /></p>
-<p><strong>Database:</strong> PostgreSQL, chosen for ACID guarantees on the document metadata (source of truth), native JSONB for flexible per-tenant metadata without a rigid schema migration for every new field, and because it can serve both as the OLTP store and (via GIN indexes) the search index in one system for this scale.</p>
-<p><strong>Cache layers:</strong>
-1. <strong>Application-level search-result cache (Redis)</strong> — cache-aside, tenant-scoped keys, 30s TTL. Short TTL chosen deliberately: freshness matters more than hit-rate for a search product where users expect their own just-indexed documents to show up quickly.
-2. <strong>Postgres buffer cache / OS page cache</strong> — free performance from Postgres itself once the hot working set (recent tenants' data) fits in memory.
-3. <em>(Production addition)</em> <strong>CDN edge cache</strong> for <code>GET /documents/{id}</code> on read-heavy, rarely-changing documents.</p>
-<h3>1.4 API Design</h3>
-<table>
-<thead>
-<tr>
-<th>Method</th>
-<th>Path</th>
-<th>Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>POST</code></td>
-<td><code>/documents</code></td>
-<td>Index a new document</td>
-</tr>
-<tr>
-<td><code>GET</code></td>
-<td><code>/search?q={query}&amp;tenant={tenantId}&amp;limit=&amp;offset=</code></td>
-<td>Full-text search, ranked</td>
-</tr>
-<tr>
-<td><code>GET</code></td>
-<td><code>/documents/{id}</code></td>
-<td>Retrieve a single document</td>
-</tr>
-<tr>
-<td><code>DELETE</code></td>
-<td><code>/documents/{id}</code></td>
-<td>Remove a document</td>
-</tr>
-<tr>
-<td><code>GET</code></td>
-<td><code>/health</code></td>
-<td>Liveness + dependency status</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Tenant identification:</strong> <code>X-Tenant-ID</code> header (preferred — mirrors a production topology where an API gateway injects this from a validated JWT claim) or <code>tenant</code> query param (per the assignment's example contract). Header takes precedence if both are present.</p>
-<p><strong>Example — index a document:</strong></p>
+        <h3>1.3 Storage Strategy: Search Engine, Database, Cache</h3>
+        <p><strong>Search engine choice — Postgres FTS (prototype) vs. Elasticsearch (production-scale):</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Criterion</th>
+                    <th>PostgreSQL FTS</th>
+                    <th>Elasticsearch</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Operational overhead</td>
+                    <td>None — same DB you already run</td>
+                    <td>Separate cluster to operate, monitor, upgrade</td>
+                </tr>
+                <tr>
+                    <td>Cost to run for a prototype/demo</td>
+                    <td>$0 (free-tier Postgres)</td>
+                    <td>No good permanent free tier</td>
+                </tr>
+                <tr>
+                    <td>Relevance ranking sophistication</td>
+                    <td>Good (<code>ts_rank_cd</code>, weighted fields)</td>
+                    <td>Better (BM25, custom scoring, ML re-ranking)</td>
+                </tr>
+                <tr>
+                    <td>Horizontal scalability of the index itself</td>
+                    <td>Limited — scales with the DB (read replicas help reads, not write-side index sharding)</td>
+                    <td>Native sharding across nodes, built for this</td>
+                </tr>
+                <tr>
+                    <td>Faceted search / aggregations at scale</td>
+                    <td>Workable via SQL <code>GROUP BY</code>, degrades at very large N</td>
+                    <td>First-class, fast at scale</td>
+                </tr>
+                <tr>
+                    <td>Fuzzy / typo-tolerant search</td>
+                    <td><code>pg_trgm</code> similarity — good enough for moderate scale</td>
+                    <td>Native fuzzy matching, more tunable</td>
+                </tr>
+                <tr>
+                    <td>Best fit</td>
+                    <td>≤ a few tens of millions of rows, team wants one less system</td>
+                    <td>10M+ docs, heavy query load, dedicated search team</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><strong>Decision for this exercise:</strong> Postgres FTS, because (a) the assignment's own volume target (10M+ documents) is within Postgres FTS's comfortable range if indexed and tuned correctly, (b) it lets the prototype run entirely on free-tier infrastructure with zero extra moving parts, and (c) it keeps the write path simpler (no dual-write consistency problem between DB and search index). <strong>For a genuine 100M+ document, sub-100ms-p99, multi-region deployment, I would migrate the search index to Elasticsearch/OpenSearch</strong> while keeping Postgres as the system of record — this is a well-trodden pattern (CDC from Postgres → Kafka → Elasticsearch indexer) and is discussed further in Section 2.</p>
+        <p><img alt="Production-scale extension: Postgres feeds a change-data-capture stream into Kafka, consumed by indexing workers that keep Elasticsearch in sync for search traffic" src="/static/diagrams/production-scale-diagram.svg" /></p>
+        <p><strong>Database:</strong> PostgreSQL, chosen for ACID guarantees on the document metadata (source of truth), native JSONB for flexible per-tenant metadata without a rigid schema migration for every new field, and because it can serve both as the OLTP store and (via GIN indexes) the search index in one system for this scale.</p>
+        <p>
+            <strong>Cache layers:</strong>
+            1. <strong>Application-level search-result cache (Redis)</strong> — cache-aside, tenant-scoped keys, 30s TTL. Short TTL chosen deliberately: freshness matters more than hit-rate for a search product where users expect their own just-indexed documents to show up quickly.
+            2. <strong>Postgres buffer cache / OS page cache</strong> — free performance from Postgres itself once the hot working set (recent tenants' data) fits in memory.
+            3. <em>(Production addition)</em> <strong>CDN edge cache</strong> for <code>GET /documents/{id}</code> on read-heavy, rarely-changing documents.
+        </p>
+        <h3>1.4 API Design</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>Path</th>
+                    <th>Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>POST</code></td>
+                    <td><code>/documents</code></td>
+                    <td>Index a new document</td>
+                </tr>
+                <tr>
+                    <td><code>GET</code></td>
+                    <td><code>/search?q={query}&amp;tenant={tenantId}&amp;limit=&amp;offset=</code></td>
+                    <td>Full-text search, ranked</td>
+                </tr>
+                <tr>
+                    <td><code>GET</code></td>
+                    <td><code>/documents/{id}</code></td>
+                    <td>Retrieve a single document</td>
+                </tr>
+                <tr>
+                    <td><code>DELETE</code></td>
+                    <td><code>/documents/{id}</code></td>
+                    <td>Remove a document</td>
+                </tr>
+                <tr>
+                    <td><code>GET</code></td>
+                    <td><code>/health</code></td>
+                    <td>Liveness + dependency status</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><strong>Tenant identification:</strong> <code>X-Tenant-ID</code> header (preferred — mirrors a production topology where an API gateway injects this from a validated JWT claim) or <code>tenant</code> query param (per the assignment's example contract). Header takes precedence if both are present.</p>
+        <p><strong>Example — index a document:</strong></p>
 <pre><code class="language-http">POST /documents
 X-Tenant-ID: tenant-acme
 Content-Type: application/json
@@ -319,7 +392,7 @@ Content-Type: application/json
   &quot;updated_at&quot;: &quot;2026-09-01T02:13:10.610212Z&quot;
 }
 </code></pre>
-<p><strong>Example — search:</strong></p>
+        <p><strong>Example — search:</strong></p>
 <pre><code class="language-http">GET /search?q=quarterly%20revenue&amp;limit=10
 X-Tenant-ID: tenant-acme
 </code></pre>
@@ -344,158 +417,171 @@ X-Tenant-ID: tenant-acme
   ]
 }
 </code></pre>
-<p><strong>Error contract (consistent shape across all endpoints):</strong></p>
+        <p><strong>Error contract (consistent shape across all endpoints):</strong></p>
 <pre><code class="language-json">{ &quot;error&quot;: &quot;internal_server_error&quot;, &quot;detail&quot;: &quot;human-readable message&quot; }
 </code></pre>
-<p>Full interactive contract is also auto-generated at <code>/docs</code> (Swagger UI) and <code>/openapi.json</code> by FastAPI.</p>
-<h3>1.5 Consistency Model and Trade-offs</h3>
-<ul>
-<li><strong>Within the write path (document CRUD):</strong> strongly consistent — Postgres transactions guarantee a <code>POST</code> is immediately visible to a subsequent <code>GET /documents/{id}</code>.</li>
-<li><strong>Within the search path:</strong> <strong>eventually consistent by design</strong>, for two independent reasons:</li>
-<li>The Redis search-result cache can serve up-to-30-seconds-stale results.</li>
-<li>In the production architecture with a separate search engine (Elasticsearch), there's an inherent propagation delay between "document written to Postgres" and "document searchable" while the async indexer catches up.</li>
-<li><strong>Trade-off accepted:</strong> search is read-heavy and tolerant of a few seconds of staleness (nobody expects a search index to be a real-time mirror), so we trade strict consistency for throughput and horizontal scalability on the read path. This is the same trade-off made by virtually every production search system (Google, Elasticsearch itself, Algolia).</li>
-<li><strong>Where we do NOT relax consistency:</strong> tenant isolation. Every query — cached or not — is scoped by <code>tenant_id</code> at the query level, never only at the cache-key level, so a cache bug can't leak another tenant's data.</li>
-</ul>
-<h3>1.6 Caching Strategy (Summary)</h3>
-<table>
-<thead>
-<tr>
-<th>Layer</th>
-<th>What's cached</th>
-<th>TTL / invalidation</th>
-<th>Why</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Redis — search results</td>
-<td>Full search response per (tenant, query, limit, offset)</td>
-<td>30s TTL, no active invalidation</td>
-<td>Simplicity; avoids tracking "which cached queries does this write affect"</td>
-</tr>
-<tr>
-<td>Redis — rate-limit counters</td>
-<td>Per-tenant request count in current window</td>
-<td>Auto-expires at window end</td>
-<td>O(1) fixed-window limiter</td>
-</tr>
-<tr>
-<td>Postgres buffer cache</td>
-<td>Hot table/index pages</td>
-<td>LRU, automatic</td>
-<td>Free win from the DB engine</td>
-</tr>
-<tr>
-<td><em>(Production)</em> CDN</td>
-<td>Individual document GETs</td>
-<td>Cache-Control headers, purge on delete/update</td>
-<td>Offloads read traffic from the API entirely</td>
-</tr>
-</tbody>
-</table>
-<h3>1.7 Message Queue Usage</h3>
-<p>Not present in the prototype (Postgres FTS's synchronous generated column makes it unnecessary at this scale), but designed into the production architecture for two purposes:</p>
-<ol>
-<li><strong>Decoupling ingestion from indexing</strong> when the search index is a separate system (Elasticsearch): write path publishes an event, indexing workers consume it, so a slow or temporarily-down search cluster never blocks document writes.</li>
-<li><strong>Absorbing burst traffic</strong>: a customer bulk-uploading 500K documents shouldn't be able to overwhelm the indexing pipeline or degrade search latency for other tenants — the queue acts as a buffer, and workers scale independently based on queue depth.</li>
-</ol>
-<p><strong>Choice:</strong> Kafka for high-throughput multi-consumer scenarios (replay, multiple indexers, analytics consumers off the same stream) or SQS for simplicity if a single consumer group and managed infra is preferred. Given the "10M+ documents, multi-tenant" scale in the brief, Kafka's replay capability and partition-per-tenant-shard potential make it the stronger long-term choice.</p>
-<h3>1.8 Multi-Tenancy Approach and Data Isolation</h3>
-<p><strong>Model chosen: shared database, shared schema, tenant_id column</strong> (aka "pool" model), not schema-per-tenant or database-per-tenant.</p>
-<table>
-<thead>
-<tr>
-<th>Isolation model</th>
-<th>Isolation strength</th>
-<th>Operational cost at 1000s of tenants</th>
-<th>Chosen?</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Database-per-tenant</td>
-<td>Strongest</td>
-<td>Very high — migrations, backups, connections all multiply</td>
-<td>No</td>
-</tr>
-<tr>
-<td>Schema-per-tenant</td>
-<td>Strong</td>
-<td>High — same migration multiplication problem, worse connection pooling</td>
-<td>No</td>
-</tr>
-<tr>
-<td><strong>Shared table + <code>tenant_id</code> column</strong></td>
-<td>Good, if enforced everywhere</td>
-<td>Low — one schema, one migration path, pooled connections</td>
-<td><strong>Yes</strong></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Why:</strong> at "10M+ documents across multiple tenants" scale, the pooled model is what virtually every multi-tenant SaaS search product uses (it's how Elasticsearch/Algolia-backed SaaS products model tenants too — as a filter field, not a separate cluster). It keeps operational cost flat as tenant count grows.</p>
-<p><strong>Enforcement layers (defense in depth):</strong>
-1. <strong>Application layer</strong> (implemented in prototype): every repository method takes <code>tenant_id</code> and includes it in the <code>WHERE</code> clause — there is no code path that queries <code>documents</code> without a tenant filter.
-2. <strong>Database layer</strong> (production addition, not in prototype): Postgres <strong>Row-Level Security (RLS)</strong> policies as a second, independent enforcement point — so even a future code bug that forgets the <code>WHERE tenant_id = ...</code> clause still can't leak data, because Postgres itself rejects the unscoped query.
-3. <strong>Index layer</strong>: <code>tenant_id</code> is the leading column in the composite <code>(tenant_id, id)</code> index, so tenant-scoped queries are always fast, never full-table scans.
-4. <strong>Rate limiting</strong>: per-tenant, so one noisy tenant can't degrade the shared infrastructure for others (implemented in prototype via Redis).</p>
-<h3>1.9 Operational Tooling (Local &amp; Cloud)</h3>
-<p>Beyond the API itself, the project includes tooling for validating and demonstrating the system without requiring a separate frontend build:</p>
-<ul>
-<li><strong>Visual search console</strong> (<code>/ui</code>, served directly by the FastAPI app from <code>app/static/search-ui.html</code>) — lets anyone index documents and run live, highlighted searches from a browser, locally or against the deployed instance, with no separate install. A standalone copy of the same file also exists at the repo root for pointing at any environment by editing its API URL field.</li>
-<li><strong>Adminer</strong> (local only, via <code>docker-compose.yml</code>) — a lightweight Postgres web UI for browsing the raw <code>documents</code> table, useful for demonstrating the <code>tenant_id</code> column and the generated <code>search_vector</code> column directly. <strong>Deliberately not deployed to the cloud environment</strong> — exposing a database login page on a public URL is unnecessary risk for a demo; the equivalent capability in production is Neon's own built-in SQL Editor, reached through an authenticated console login rather than an open port.</li>
-<li><strong>Seed &amp; benchmark script</strong> (<code>scripts/seed_and_benchmark.py</code>) — generates realistic sample documents and measures real p50/p95/p99 search latency (see §2.5 for results from an actual run).</li>
-</ul>
-<hr />
-<h2>2. Production Readiness Analysis</h2>
-<h3>2.1 Scalability — handling 100x growth (1B+ documents, 100K+ req/s)</h3>
-<ul>
-<li><strong>Database:</strong> move from a single Postgres instance to (a) <strong>read replicas</strong> for search traffic (search is read-heavy — route <code>GET /search</code> to replicas, keep writes on primary), (b) <strong>partitioning</strong> the <code>documents</code> table by <code>tenant_id</code> hash or by time, so any single index/vacuum operation touches a bounded slice of data, (c) at genuine 100M+ scale, migrate the search index off Postgres entirely to <strong>Elasticsearch/OpenSearch</strong> with tenant-aware sharding (route by tenant_id hash to a shard), keeping Postgres as the source-of-truth metadata store behind a CDC pipeline (Debezium → Kafka → ES indexer).</li>
-<li><strong>App tier:</strong> already stateless — scale by adding more container replicas behind the load balancer (Kubernetes HPA on CPU/request-latency, or equivalent autoscaling group). No code changes needed; this is the entire point of the stateless design.</li>
-<li><strong>Cache:</strong> move from single-node Redis to <strong>Redis Cluster</strong> (sharded) once cache traffic outgrows one node's memory/throughput.</li>
-<li><strong>Rate limiter:</strong> the current fixed-window Redis counter scales fine even at 100x since it's O(1) per request — no changes needed structurally, just ensure the Redis cluster backing it is itself scaled.</li>
-</ul>
-<h3>2.2 Resilience — circuit breakers, retries, failover</h3>
-<ul>
-<li><strong>Circuit breakers</strong> between the app and both Postgres and the search cluster: if Elasticsearch (production) starts timing out, trip the breaker and serve degraded results (e.g., cached-only, or Postgres-FTS-as-fallback) rather than cascading the failure into request pile-up and thread/connection exhaustion.</li>
-<li><strong>Retry strategy:</strong> exponential backoff with jitter for transient failures (connection resets, brief network partitions), capped retry count, and importantly — <strong>retries must be idempotent-safe</strong>. <code>DELETE</code> and <code>GET</code> are naturally idempotent; <code>POST /documents</code> should accept an optional client-supplied idempotency key to make retried indexing calls safe.</li>
-<li><strong>Failover:</strong> Postgres primary failure → automated promotion of a standby replica (e.g., via Patroni or a managed provider's built-in failover — this is exactly why we'd choose a managed Postgres in production rather than self-hosting). Redis failure → the rate limiter and cache are both designed to <strong>fail open</strong> (already implemented in the prototype: if Redis errors, rate limiting is skipped and cache is bypassed rather than the request failing) — a deliberate choice that trades perfect enforcement for availability of the core search function.</li>
-<li><strong>Bulkheads:</strong> isolate the indexing worker pool from the query-serving app pool so a burst of writes can't starve read capacity.</li>
-</ul>
-<h3>2.3 Security</h3>
-<ul>
-<li><strong>AuthN/AuthZ:</strong> JWT-based auth validated at the API gateway; the JWT's tenant claim becomes the trusted source for <code>X-Tenant-ID</code> (in the prototype the header is trusted directly for simplicity — in production it must be derived from a verified token, never accepted as a raw client-supplied header, or any client could claim to be any tenant).</li>
-<li><strong>Encryption in transit:</strong> TLS everywhere (client→gateway, gateway→app, app→Postgres/Redis using <code>sslmode=require</code> and Redis TLS).</li>
-<li><strong>Encryption at rest:</strong> managed Postgres/Redis providers offer this by default (e.g., Supabase, RDS, ElastiCache); enable it explicitly rather than assuming defaults.</li>
-<li><strong>API security:</strong> input validation (already done via Pydantic schemas), request size limits (prevent giant payload DoS), per-tenant rate limiting (implemented), WAF at the edge for common injection/XSS patterns, and secrets (DB/Redis credentials) in a secrets manager (not env files) in production.</li>
-<li><strong>Tenant isolation as a security boundary</strong>, not just a data-modeling choice — see Section 1.8's defense-in-depth layers, especially RLS as the production hardening step beyond what the prototype does at the application layer alone.</li>
-</ul>
-<h3>2.4 Observability</h3>
-<ul>
-<li><strong>Metrics:</strong> RED metrics per endpoint (Rate, Errors, Duration) exported in Prometheus format; key custom metrics: search latency p50/p95/p99 (already measured in the benchmark script), cache hit rate, per-tenant request volume, rate-limit rejection rate.</li>
-<li><strong>Logging:</strong> structured JSON logs (not the plain console logs the prototype uses), with <code>tenant_id</code> and a <code>request_id</code> on every log line for traceable debugging, shipped to a centralized system (e.g., Loki, CloudWatch Logs, ELK).</li>
-<li><strong>Distributed tracing:</strong> OpenTelemetry instrumentation across the app → Postgres/Redis/queue call graph, so a single slow search request can be traced end-to-end (which layer added the latency: cache miss? slow query? network?). This directly extends the <code>X-Process-Time-Ms</code> header already emitted by the prototype's middleware into a full trace span.</li>
-<li><strong>Alerting:</strong> SLO-based alerts (e.g., "p95 search latency &gt; 500ms for 5 minutes") rather than naive threshold-per-metric alerts, to reduce noise and tie alerts directly to user-facing impact.</li>
-</ul>
-<h3>2.5 Performance — DB optimization, index management, query optimization</h3>
-<ul>
-<li><strong>Index management:</strong> the prototype's GIN index on <code>search_vector</code> is the single most important index; monitor index bloat and run <code>REINDEX CONCURRENTLY</code> periodically at scale. Partial indexes per common filter (e.g., per <code>metadata-&gt;category</code>) can help specific hot query patterns.</li>
-<li><strong>Query optimization:</strong> the benchmark run during development surfaced a concrete finding worth highlighting — <strong>connection pool sizing directly bounded p95/p99 latency under concurrent load</strong> (p95 dropped from ~1.4s to ~0.21s once concurrency was sized to the connection pool rather than exceeding it). At 100x scale this generalizes to: pool sizing, PgBouncer (connection pooling proxy) in front of Postgres, and <code>EXPLAIN ANALYZE</code>-driven query tuning are not optional — they are the difference between meeting and missing the 500ms p95 SLA.</li>
-<li><strong>Database optimization:</strong> vacuum/analyze tuning for write-heavy tables, appropriate <code>shared_buffers</code>/<code>work_mem</code> sizing, and read replicas to separate search-read load from write load.</li>
-</ul>
-<h3>2.6 Operations — deployment, zero-downtime, backup/recovery</h3>
-<ul>
-<li><strong>Deployment strategy:</strong> blue-green or rolling deployment behind the load balancer — new version's containers pass health checks (the <code>/health</code> endpoint, already implemented, is exactly what a deployment orchestrator polls) before traffic shifts, old version stays up until the new one is confirmed healthy, enabling instant rollback.</li>
-<li><strong>Zero-downtime schema changes:</strong> additive-only migrations in the deploy path (add nullable columns, backfill asynchronously, only make <code>NOT NULL</code> in a later release) — never a blocking <code>ALTER TABLE</code> on a large table during a deploy window.</li>
-<li><strong>Backup/recovery:</strong> automated daily Postgres snapshots + continuous WAL archiving for point-in-time recovery; regular restore drills (a backup nobody has tested restoring is not a real backup).</li>
-</ul>
-<h3>2.7 SLA Considerations — achieving 99.95% availability</h3>
-<p>99.95% availability ≈ <strong>~4.4 hours of downtime allowed per year</strong> (~21.6 minutes/month). To hit this:
-- No single point of failure: multi-AZ Postgres with automated failover, multiple app replicas across AZs, Redis with replica failover.
-- Health-check-gated deployments (Section 2.6) so bad deploys never count against the SLA window.
-- Circuit breakers + fail-open cache/rate-limiter (Section 2.2) so a <em>dependency's</em> outage degrades gracefully rather than taking the whole API down — this is why the health endpoint distinguishes <code>degraded</code> (Redis down, core search still works) from <code>unhealthy</code> (Postgres down, cannot serve).
-- Load testing before scale events (product launches, known traffic spikes) rather than discovering capacity limits in production.</p>
-<hr />
-</main>
+        <p>Full interactive contract is also auto-generated at <code>/docs</code> (Swagger UI) and <code>/openapi.json</code> by FastAPI.</p>
+        <h3>1.4.1 Database Schema &amp; Indexing Strategy (Worked Example)</h3>
+        <p>The <code>documents</code> table has <strong>8 fields</strong>. Three of them — <code>title</code>, <code>content</code>, <code>metadata</code> — hold the client's actual submitted data unmodified. A fourth, <code>search_vector</code>, is auto-generated by Postgres from <code>title</code>+<code>content</code> purely to enable search, weighting title matches higher than body matches. On top of all this, there are <strong>5 indexes</strong>: 1 implicit (the primary key's uniqueness index, which Postgres creates automatically) and 4 explicit ones added deliberately — a GIN index on <code>search_vector</code> for full-text search, a trigram GIN index on <code>title</code> for fuzzy matching, a general tenant index, and a composite tenant+id index matching the exact query pattern of the single-document endpoints.</p>
+        <p><strong>Worked example</strong> — indexing a document with <code>title: "Vehicle Detection"</code> and <code>content: "Real time vehicle detection system of people who can use the app on a daily basis"</code>, then inspecting the resulting row directly in Postgres:</p>
+        <p><img alt="Table showing all 8 fields of a real inserted row: id, tenant_id, title, content, metadata, search_vector, created_at, updated_at — with the actual generated search_vector value visible" src="/static/diagrams/sample-document-fields.png" /></p>
+        <p>Notice <code>search_vector</code> is not a copy of your text — it's a stemmed, stop-word-filtered, weighted token list (<code>'vehicl':1A,5B</code> means "vehicle" appears at position 1 in the <em>title</em> (weight A) and position 5 in the <em>content</em> (weight B), merged into one entry). This is what actually gets indexed, not the raw <code>title</code>/<code>content</code> strings.</p>
+        <p><strong>What each of the 5 indexes conceptually stores</strong> for this same row:</p>
+        <p><img alt="Table listing all 5 indexes on the documents table — their type, what they store, and what they point to — including the implicit primary key index and 4 explicit indexes" src="/static/diagrams/index-storage-explained.png" /></p>
+        <p>The practical distinction: <strong>B-tree indexes</strong> (rows 1, 2, 5 in the table above) store one entry per whole value — good for exact lookups like "find this id" or "find this tenant." <strong>GIN indexes</strong> (rows 3, 4) store one entry per <em>fragment</em> of a value — one entry per word for full-text search, one entry per 3-character chunk for fuzzy trigram matching — because text needs to be broken into searchable pieces first, while a UUID or tenant string doesn't.</p>
+        <h3>1.5 Consistency Model and Trade-offs</h3>
+        <ul>
+            <li><strong>Within the write path (document CRUD):</strong> strongly consistent — Postgres transactions guarantee a <code>POST</code> is immediately visible to a subsequent <code>GET /documents/{id}</code>.</li>
+            <li><strong>Within the search path:</strong> <strong>eventually consistent by design</strong>, for two independent reasons:</li>
+            <li>The Redis search-result cache can serve up-to-30-seconds-stale results.</li>
+            <li>In the production architecture with a separate search engine (Elasticsearch), there's an inherent propagation delay between "document written to Postgres" and "document searchable" while the async indexer catches up.</li>
+            <li><strong>Trade-off accepted:</strong> search is read-heavy and tolerant of a few seconds of staleness (nobody expects a search index to be a real-time mirror), so we trade strict consistency for throughput and horizontal scalability on the read path. This is the same trade-off made by virtually every production search system (Google, Elasticsearch itself, Algolia).</li>
+            <li><strong>Where we do NOT relax consistency:</strong> tenant isolation. Every query — cached or not — is scoped by <code>tenant_id</code> at the query level, never only at the cache-key level, so a cache bug can't leak another tenant's data.</li>
+        </ul>
+        <h3>1.6 Caching Strategy (Summary)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Layer</th>
+                    <th>What's cached</th>
+                    <th>TTL / invalidation</th>
+                    <th>Why</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Redis — search results</td>
+                    <td>Full search response per (tenant, query, limit, offset)</td>
+                    <td>30s TTL, no active invalidation</td>
+                    <td>Simplicity; avoids tracking "which cached queries does this write affect"</td>
+                </tr>
+                <tr>
+                    <td>Redis — rate-limit counters</td>
+                    <td>Per-tenant request count in current window</td>
+                    <td>Auto-expires at window end</td>
+                    <td>O(1) fixed-window limiter</td>
+                </tr>
+                <tr>
+                    <td>Postgres buffer cache</td>
+                    <td>Hot table/index pages</td>
+                    <td>LRU, automatic</td>
+                    <td>Free win from the DB engine</td>
+                </tr>
+                <tr>
+                    <td><em>(Production)</em> CDN</td>
+                    <td>Individual document GETs</td>
+                    <td>Cache-Control headers, purge on delete/update</td>
+                    <td>Offloads read traffic from the API entirely</td>
+                </tr>
+            </tbody>
+        </table>
+        <h3>1.7 Message Queue Usage</h3>
+        <p>Not present in the prototype (Postgres FTS's synchronous generated column makes it unnecessary at this scale), but designed into the production architecture for two purposes:</p>
+        <ol>
+            <li><strong>Decoupling ingestion from indexing</strong> when the search index is a separate system (Elasticsearch): write path publishes an event, indexing workers consume it, so a slow or temporarily-down search cluster never blocks document writes.</li>
+            <li><strong>Absorbing burst traffic</strong>: a customer bulk-uploading 500K documents shouldn't be able to overwhelm the indexing pipeline or degrade search latency for other tenants — the queue acts as a buffer, and workers scale independently based on queue depth.</li>
+        </ol>
+        <p><strong>Choice:</strong> Kafka for high-throughput multi-consumer scenarios (replay, multiple indexers, analytics consumers off the same stream) or SQS for simplicity if a single consumer group and managed infra is preferred. Given the "10M+ documents, multi-tenant" scale in the brief, Kafka's replay capability and partition-per-tenant-shard potential make it the stronger long-term choice.</p>
+        <h3>1.8 Multi-Tenancy Approach and Data Isolation</h3>
+        <p><strong>Model chosen: shared database, shared schema, tenant_id column</strong> (aka "pool" model), not schema-per-tenant or database-per-tenant.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Isolation model</th>
+                    <th>Isolation strength</th>
+                    <th>Operational cost at 1000s of tenants</th>
+                    <th>Chosen?</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Database-per-tenant</td>
+                    <td>Strongest</td>
+                    <td>Very high — migrations, backups, connections all multiply</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td>Schema-per-tenant</td>
+                    <td>Strong</td>
+                    <td>High — same migration multiplication problem, worse connection pooling</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td><strong>Shared table + <code>tenant_id</code> column</strong></td>
+                    <td>Good, if enforced everywhere</td>
+                    <td>Low — one schema, one migration path, pooled connections</td>
+                    <td><strong>Yes</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        <p><strong>Why:</strong> at "10M+ documents across multiple tenants" scale, the pooled model is what virtually every multi-tenant SaaS search product uses (it's how Elasticsearch/Algolia-backed SaaS products model tenants too — as a filter field, not a separate cluster). It keeps operational cost flat as tenant count grows.</p>
+        <p>
+            <strong>Enforcement layers (defense in depth):</strong>
+            1. <strong>Application layer</strong> (implemented in prototype): every repository method takes <code>tenant_id</code> and includes it in the <code>WHERE</code> clause — there is no code path that queries <code>documents</code> without a tenant filter.
+            2. <strong>Database layer</strong> (production addition, not in prototype): Postgres <strong>Row-Level Security (RLS)</strong> policies as a second, independent enforcement point — so even a future code bug that forgets the <code>WHERE tenant_id = ...</code> clause still can't leak data, because Postgres itself rejects the unscoped query.
+            3. <strong>Index layer</strong>: <code>tenant_id</code> is the leading column in the composite <code>(tenant_id, id)</code> index, so tenant-scoped queries are always fast, never full-table scans.
+            4. <strong>Rate limiting</strong>: per-tenant, so one noisy tenant can't degrade the shared infrastructure for others (implemented in prototype via Redis).
+        </p>
+        <h3>1.9 Operational Tooling (Local &amp; Cloud)</h3>
+        <p>Beyond the API itself, the project includes tooling for validating and demonstrating the system without requiring a separate frontend build:</p>
+        <ul>
+            <li><strong>Visual search console</strong> (<code>/ui</code>, served directly by the FastAPI app from <code>app/static/search-ui.html</code>) — lets anyone index documents and run live, highlighted searches from a browser, locally or against the deployed instance, with no separate install or file to open manually.</li>
+            <li><strong>Adminer</strong> (local only, via <code>docker-compose.yml</code>) — a lightweight Postgres web UI for browsing the raw <code>documents</code> table, useful for demonstrating the <code>tenant_id</code> column and the generated <code>search_vector</code> column directly. <strong>Deliberately not deployed to the cloud environment</strong> — exposing a database login page on a public URL is unnecessary risk for a demo; the equivalent capability in production is Neon's own built-in SQL Editor, reached through an authenticated console login rather than an open port.</li>
+            <li><strong>Seed &amp; benchmark script</strong> (<code>scripts/seed_and_benchmark.py</code>) — generates realistic sample documents and measures real p50/p95/p99 search latency (see §2.5 for results from an actual run).</li>
+        </ul>
+        <hr />
+        <h2>2. Production Readiness Analysis</h2>
+        <h3>2.1 Scalability — handling 100x growth (1B+ documents, 100K+ req/s)</h3>
+        <ul>
+            <li><strong>Database:</strong> move from a single Postgres instance to (a) <strong>read replicas</strong> for search traffic (search is read-heavy — route <code>GET /search</code> to replicas, keep writes on primary), (b) <strong>partitioning</strong> the <code>documents</code> table by <code>tenant_id</code> hash or by time, so any single index/vacuum operation touches a bounded slice of data, (c) at genuine 100M+ scale, migrate the search index off Postgres entirely to <strong>Elasticsearch/OpenSearch</strong> with tenant-aware sharding (route by tenant_id hash to a shard), keeping Postgres as the source-of-truth metadata store behind a CDC pipeline (Debezium → Kafka → ES indexer).</li>
+            <li><strong>App tier:</strong> already stateless — scale by adding more container replicas behind the load balancer (Kubernetes HPA on CPU/request-latency, or equivalent autoscaling group). No code changes needed; this is the entire point of the stateless design.</li>
+            <li><strong>Cache:</strong> move from single-node Redis to <strong>Redis Cluster</strong> (sharded) once cache traffic outgrows one node's memory/throughput.</li>
+            <li><strong>Rate limiter:</strong> the current fixed-window Redis counter scales fine even at 100x since it's O(1) per request — no changes needed structurally, just ensure the Redis cluster backing it is itself scaled.</li>
+        </ul>
+        <h3>2.2 Resilience — circuit breakers, retries, failover</h3>
+        <ul>
+            <li><strong>Circuit breakers</strong> between the app and both Postgres and the search cluster: if Elasticsearch (production) starts timing out, trip the breaker and serve degraded results (e.g., cached-only, or Postgres-FTS-as-fallback) rather than cascading the failure into request pile-up and thread/connection exhaustion.</li>
+            <li><strong>Retry strategy:</strong> exponential backoff with jitter for transient failures (connection resets, brief network partitions), capped retry count, and importantly — <strong>retries must be idempotent-safe</strong>. <code>DELETE</code> and <code>GET</code> are naturally idempotent; <code>POST /documents</code> should accept an optional client-supplied idempotency key to make retried indexing calls safe.</li>
+            <li><strong>Failover:</strong> Postgres primary failure → automated promotion of a standby replica (e.g., via Patroni or a managed provider's built-in failover — this is exactly why we'd choose a managed Postgres in production rather than self-hosting). Redis failure → the rate limiter and cache are both designed to <strong>fail open</strong> (already implemented in the prototype: if Redis errors, rate limiting is skipped and cache is bypassed rather than the request failing) — a deliberate choice that trades perfect enforcement for availability of the core search function.</li>
+            <li><strong>Bulkheads:</strong> isolate the indexing worker pool from the query-serving app pool so a burst of writes can't starve read capacity.</li>
+        </ul>
+        <h3>2.3 Security</h3>
+        <ul>
+            <li><strong>AuthN/AuthZ:</strong> JWT-based auth validated at the API gateway; the JWT's tenant claim becomes the trusted source for <code>X-Tenant-ID</code> (in the prototype the header is trusted directly for simplicity — in production it must be derived from a verified token, never accepted as a raw client-supplied header, or any client could claim to be any tenant).</li>
+            <li><strong>Encryption in transit:</strong> TLS everywhere (client→gateway, gateway→app, app→Postgres/Redis using <code>sslmode=require</code> and Redis TLS).</li>
+            <li><strong>Encryption at rest:</strong> managed Postgres/Redis providers offer this by default (e.g., Supabase, RDS, ElastiCache); enable it explicitly rather than assuming defaults.</li>
+            <li><strong>API security:</strong> input validation (already done via Pydantic schemas), request size limits (prevent giant payload DoS), per-tenant rate limiting (implemented), WAF at the edge for common injection/XSS patterns, and secrets (DB/Redis credentials) in a secrets manager (not env files) in production.</li>
+            <li><strong>Tenant isolation as a security boundary</strong>, not just a data-modeling choice — see Section 1.8's defense-in-depth layers, especially RLS as the production hardening step beyond what the prototype does at the application layer alone.</li>
+        </ul>
+        <h3>2.4 Observability</h3>
+        <ul>
+            <li><strong>Metrics:</strong> RED metrics per endpoint (Rate, Errors, Duration) exported in Prometheus format; key custom metrics: search latency p50/p95/p99 (already measured in the benchmark script), cache hit rate, per-tenant request volume, rate-limit rejection rate.</li>
+            <li><strong>Logging:</strong> structured JSON logs (not the plain console logs the prototype uses), with <code>tenant_id</code> and a <code>request_id</code> on every log line for traceable debugging, shipped to a centralized system (e.g., Loki, CloudWatch Logs, ELK).</li>
+            <li><strong>Distributed tracing:</strong> OpenTelemetry instrumentation across the app → Postgres/Redis/queue call graph, so a single slow search request can be traced end-to-end (which layer added the latency: cache miss? slow query? network?). This directly extends the <code>X-Process-Time-Ms</code> header already emitted by the prototype's middleware into a full trace span.</li>
+            <li><strong>Alerting:</strong> SLO-based alerts (e.g., "p95 search latency &gt; 500ms for 5 minutes") rather than naive threshold-per-metric alerts, to reduce noise and tie alerts directly to user-facing impact.</li>
+        </ul>
+        <h3>2.5 Performance — DB optimization, index management, query optimization</h3>
+        <ul>
+            <li><strong>Index management:</strong> the prototype's GIN index on <code>search_vector</code> is the single most important index; monitor index bloat and run <code>REINDEX CONCURRENTLY</code> periodically at scale. Partial indexes per common filter (e.g., per <code>metadata-&gt;category</code>) can help specific hot query patterns.</li>
+            <li><strong>Query optimization:</strong> the benchmark run during development surfaced a concrete finding worth highlighting — <strong>connection pool sizing directly bounded p95/p99 latency under concurrent load</strong> (p95 dropped from ~1.4s to ~0.21s once concurrency was sized to the connection pool rather than exceeding it). At 100x scale this generalizes to: pool sizing, PgBouncer (connection pooling proxy) in front of Postgres, and <code>EXPLAIN ANALYZE</code>-driven query tuning are not optional — they are the difference between meeting and missing the 500ms p95 SLA.</li>
+            <li><strong>Database optimization:</strong> vacuum/analyze tuning for write-heavy tables, appropriate <code>shared_buffers</code>/<code>work_mem</code> sizing, and read replicas to separate search-read load from write load.</li>
+            <li><strong>Future enhancement — hybrid semantic search:</strong> the current search is purely lexical (keyword/stem matching via <code>search_vector</code>), which won't surface conceptually related results that don't share exact word stems (e.g. searching "car" won't match a document that only says "vehicle"). A natural next step is <strong>hybrid search</strong>: add a <code>pgvector</code> column storing an embedding of each document, generate a query embedding at search time, and merge lexical (<code>ts_rank_cd</code>) and semantic (cosine-distance) scores into one ranked result set. This stays entirely within the existing Postgres instance (no new database), adds one embedding-API call per write and per search, and is a well-established production pattern rather than a speculative one. I evaluated bringing in a dedicated vector database (Chroma/Pinecone) and an LLM-orchestration framework (LangChain/LangGraph) for this, and deliberately chose not to — those tools solve multi-step <em>agentic</em> problems (chained reasoning, tool-calling) that don't exist in a search API with no generation step, and Chroma's single-node design and Pinecone's free-tier limits both work against this project's 10M-document, free-tier-deployable requirements. <code>pgvector</code> was the right-sized choice; the heavier stack would have been complexity without a matching problem.</li>
+        </ul>
+        <h3>2.6 Operations — deployment, zero-downtime, backup/recovery</h3>
+        <ul>
+            <li><strong>Deployment strategy:</strong> blue-green or rolling deployment behind the load balancer — new version's containers pass health checks (the <code>/health</code> endpoint, already implemented, is exactly what a deployment orchestrator polls) before traffic shifts, old version stays up until the new one is confirmed healthy, enabling instant rollback.</li>
+            <li><strong>Zero-downtime schema changes:</strong> additive-only migrations in the deploy path (add nullable columns, backfill asynchronously, only make <code>NOT NULL</code> in a later release) — never a blocking <code>ALTER TABLE</code> on a large table during a deploy window.</li>
+            <li><strong>Backup/recovery:</strong> automated daily Postgres snapshots + continuous WAL archiving for point-in-time recovery; regular restore drills (a backup nobody has tested restoring is not a real backup).</li>
+        </ul>
+        <h3>2.7 SLA Considerations — achieving 99.95% availability</h3>
+        <p>
+            99.95% availability ≈ <strong>~4.4 hours of downtime allowed per year</strong> (~21.6 minutes/month). To hit this:
+            - No single point of failure: multi-AZ Postgres with automated failover, multiple app replicas across AZs, Redis with replica failover.
+            - Health-check-gated deployments (Section 2.6) so bad deploys never count against the SLA window.
+            - Circuit breakers + fail-open cache/rate-limiter (Section 2.2) so a <em>dependency's</em> outage degrades gracefully rather than taking the whole API down — this is why the health endpoint distinguishes <code>degraded</code> (Redis down, core search still works) from <code>unhealthy</code> (Postgres down, cannot serve).
+            - Load testing before scale events (product launches, known traffic spikes) rather than discovering capacity limits in production.
+        </p>
+        <hr />
+    </main>
 </body>
 </html>
